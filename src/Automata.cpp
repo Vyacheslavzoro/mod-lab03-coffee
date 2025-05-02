@@ -1,98 +1,121 @@
 #include <iostream>
+#include <string>
 #include <vector>
 #include "Automata.h"
 
 Automata::Automata() {
-    status = POWER_OFF;
-    balance = 0;
-    selected = -1;
+    state = OFF;
+    cash = 0;
+    currentDrink = -1;
 
-    drinks = {"Зеленый чай", "Латте", "Какао"};
-    cost = {20, 45, 60};
+    menu.push_back("Чай");
+    menu.push_back("Кофе с молоком");
+    menu.push_back("Двойное эспрессо");
+
+    prices.push_back(15);
+    prices.push_back(30);
+    prices.push_back(50);
 }
 
 STATES Automata::getState() {
-    return status;
+    return state;
 }
 
-void Automata::displayMenu() {
-    std::cout << "Доступные напитки:\n";
-    for (size_t i = 0; i < drinks.size(); ++i) {
-        std::cout << i << ") " << drinks[i] 
-                  << " - " << cost[i] << " руб.\n";
+void Automata::getMenu() {
+    std::cout << "Меню:" << std::endl;
+    for (int i = 0; i < menu.size(); i++) {
+        std::cout << i << ": " << menu[i]
+            << " - " << prices[i] << std::endl;
     }
 }
 
-void Automata::powerOn() {
-    if (status == POWER_OFF) {
-        status = STANDBY;
-        std::cout << "Добро пожаловать!\n";
+void Automata::on() {
+    if (state == OFF) {
+        state = WAIT;
+        std::cout << "Автомат включён" << std::endl;
+    } else {
+        std::cout << "Некорректное состояние" << std::endl;
     }
 }
 
-void Automata::powerOff() {
-    if (status == STANDBY) {
-        status = POWER_OFF;
-        std::cout << "Работа завершена\n";
+void Automata::off() {
+    if (state == WAIT) {
+        state = OFF;
+        std::cout << "Автомат выключен" << std::endl;
+    } else {
+        std::cout << "Некорректное состояние" << std::endl;
     }
 }
 
-void Automata::insertCoin(int amount) {
-    if (status == STANDBY || status == PAYMENT) {
-        status = PAYMENT;
-        balance += amount;
-        std::cout << "Баланс: " << balance << " руб.\n";
+void Automata::coin(int sum) {
+    if (state == WAIT || state == ACCEPT) {
+        state = ACCEPT;
+        cash += sum;
+        std::cout << "Вы внесли " << sum
+            << ", текущий баланс: " << cash << std::endl;
+    } else {
+        std::cout << "Некорректное состояние" << std::endl;
     }
 }
 
-void Automata::cancelOrder() {
-    if (status == PAYMENT || status == VALIDATION) {
-        std::cout << "Отмена. Возврат: " << balance << " руб.\n";
-        balance = 0;
-        selected = -1;
-        status = STANDBY;
+void Automata::cancel() {
+    if (state == ACCEPT || state == CHECK) {
+        std::cout << "Заказ отменён, возврат: " << cash << std::endl;
+        cash = 0;
+        state = WAIT;
+    } else {
+        std::cout << "Некорректное состояние" << std::endl;
     }
 }
 
-void Automata::selectDrink(int index) {
-    if (status == PAYMENT) {
-        if (index >= 0 && static_cast<size_t>(index) < drinks.size()) {
-            selected = index;
-            std::cout << "Выбор: " << drinks[selected] << "\n";
-            status = VALIDATION;
-            validate();
-        }
-    }
-}
-
-void Automata::validate() {
-    if (status == VALIDATION) {
-        if (balance >= cost[selected]) {
-            prepare();
+void Automata::choice(int drinkIndex) {
+    if (state == ACCEPT) {
+        if (drinkIndex >= 0 && drinkIndex < menu.size()) {
+            std::cout << "Вы выбрали: " << menu[drinkIndex] << std::endl;
+            currentDrink = drinkIndex;
+            state = CHECK;
         } else {
-            std::cout << "Недостаточно средств. Нужно еще: " 
-                      << cost[selected] - balance << " руб.\n";
+            std::cout << "Неверный индекс напитка" << std::endl;
         }
+    } else {
+        std::cout << "Некорректное состояние" << std::endl;
     }
 }
 
-void Automata::prepare() {
-    if (status == VALIDATION) {
-        status = PREPARING;
-        std::cout << "Готовим " << drinks[selected] << "...\n";
-        complete();
+void Automata::check() {
+    if (state == CHECK) {
+        if (cash >= prices[currentDrink]) {
+            std::cout <<
+                "Денег достаточно, начинаем приготовление" << std::endl;
+        } else {
+            std::cout << "Недостаточно денег" << std::endl;
+        }
+    } else {
+        std::cout << "Некорректное состояние" << std::endl;
     }
 }
 
-void Automata::complete() {
-    if (status == PREPARING) {
-        std::cout << "Ваш " << drinks[selected] << " готов!\n";
-        if (balance > cost[selected]) {
-            std::cout << "Возьмите сдачу: " 
-                      << balance - cost[selected] << " руб.\n";
+void Automata::cook() {
+    if (state == CHECK) {
+        state = COOK;
+        std::cout << "Приготовление напитка: "
+            << menu[currentDrink] << std::endl;
+    } else {
+        std::cout << "Некорректное состояние" << std::endl;
+    }
+}
+
+void Automata::finish() {
+    if (state == COOK) {
+        std::cout << "Напиток готов" << std::endl;
+        if (cash > prices[currentDrink]) {
+            std::cout << "Сдача: " <<
+                cash - prices[currentDrink] << std::endl;
         }
-        balance = 0;
-        selected = -1;
-        status = STANDBY;
+        cash = 0;
+        state = WAIT;
+        currentDrink = -1;
+    } else {
+        std::cout << "Некорректное состояние" << std::endl;
     }
 }

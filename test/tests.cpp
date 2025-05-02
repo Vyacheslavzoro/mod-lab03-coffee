@@ -1,88 +1,99 @@
 #include <gtest/gtest.h>
 #include "Automata.h"
+#include <string> 
 
-TEST(AutomataBasic, InitialState) {
-    Automata a;
-    EXPECT_EQ(a.getState(), POWER_OFF);
+TEST(task, test1) {
+    Automata automata;
+    EXPECT_EQ(automata.getState(), OFF);
 }
 
-TEST(AutomataOperations, PowerOn) {
-    Automata a;
-    a.powerOn();
-    EXPECT_EQ(a.getState(), STANDBY);
+TEST(task, test2) {
+    Automata automata;
+    automata.on();
+    EXPECT_EQ(automata.getState(), WAIT);
 }
 
-TEST(AutomataOperations, CoinInsertion) {
-    Automata a;
-    a.powerOn();
-    a.insertCoin(70);
-    EXPECT_EQ(a.getState(), PAYMENT);
+TEST(task, test3) {
+    Automata automata;
+    automata.on();
+    automata.coin(50);
+    EXPECT_EQ(automata.getState(), ACCEPT);
 }
 
-TEST(AutomataOperations, DrinkSelection) {
-    Automata a;
-    a.powerOn();
-    a.insertCoin(100);
+TEST(task, test4) {
+    Automata automata;
+    automata.on();
+    automata.coin(100);
     testing::internal::CaptureStdout();
-    a.selectDrink(1);
+    automata.choice(-1);
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("Латте"), std::string::npos);
+    EXPECT_NE(output.find("Неверный индекс напитка"), std::string::npos);
 }
 
-TEST(AutomataOperations, ValidationSuccess) {
-    Automata a;
-    a.powerOn();
-    a.insertCoin(100);
-    a.selectDrink(2);
-    EXPECT_EQ(a.getState(), STANDBY);
-}
-
-TEST(AutomataOperations, OrderCancel) {
-    Automata a;
-    a.powerOn();
-    a.insertCoin(50);
+TEST(task, test5) {
+    Automata automata;
+    automata.on();
+    automata.coin(30);
     testing::internal::CaptureStdout();
-    a.cancelOrder();
+    automata.choice(0);
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("Возврат: 50"), std::string::npos);
+    EXPECT_NE(output.find("Вы выбрали: Чай"), std::string::npos);
 }
 
-TEST(AutomataOperations, InsufficientFunds) {
-    Automata a;
-    a.powerOn();
-    a.insertCoin(30);
+TEST(task, test6) {
+    Automata automata;
+    automata.on();
+    automata.coin(30);
+    automata.choice(0);
+    EXPECT_EQ(automata.getState(), CHECK);
+}
+
+TEST(task, test7) {
+    Automata automata;
+    automata.on();
+    automata.coin(100);
+    automata.choice(0);
     testing::internal::CaptureStdout();
-    a.selectDrink(0);
+    automata.cancel();
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("Недостаточно средств"), std::string::npos);
+    EXPECT_NE(output.find("Заказ отменён, возврат: 100"), std::string::npos);
+    EXPECT_EQ(automata.getState(), WAIT);
 }
 
-TEST(AutomataOperations, ChangeCalculation) {
-    Automata a;
-    a.powerOn();
-    a.insertCoin(100);
-    a.selectDrink(0);
+TEST(task, test8) {
+    Automata automata;
+    automata.on();
+    automata.coin(100);
+    automata.choice(0);
+    automata.check();
+    automata.cook();
+    EXPECT_EQ(automata.getState(), COOK);
+}
+
+TEST(task, test9) {
+    Automata automata;
+    automata.on();
+    automata.coin(100);
+    automata.choice(2);
+    automata.check();
+    automata.cook();
+
     testing::internal::CaptureStdout();
-    a.complete();
+    automata.finish();
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("Возьмите сдачу: 80"), std::string::npos);
+
+    EXPECT_NE(output.find("Сдача: 50"), std::string::npos);
+    EXPECT_EQ(automata.getState(), WAIT);
 }
 
-TEST(AutomataOperations, FullCycle) {
-    Automata a;
-    a.powerOn();
-    a.insertCoin(200);
-    a.selectDrink(2);
-    a.powerOff();
-    EXPECT_EQ(a.getState(), POWER_OFF);
-}
-
-TEST(AutomataEdgeCases, InvalidSelection) {
-    Automata a;
-    a.powerOn();
-    a.insertCoin(50);
-    testing::internal::CaptureStdout();
-    a.selectDrink(5);
-    std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_TRUE(output.empty());
+TEST(task, test10) {
+    Automata automata;
+    automata.on();
+    automata.coin(100);
+    automata.choice(2);
+    automata.check();
+    automata.cook();
+    automata.finish();
+    automata.off();
+    EXPECT_EQ(automata.getState(), OFF);
 }

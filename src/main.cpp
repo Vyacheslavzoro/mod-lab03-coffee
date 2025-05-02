@@ -1,16 +1,20 @@
 #include "Automata.h"
 
 int main() {
-    Automata vending;
-    
-    vending.powerOn();
-    vending.displayMenu();
-    
-    vending.insertCoin(50);
-    vending.insertCoin(20);
-    vending.selectDrink(2);
-    
-    vending.powerOff();
-    
+    Automata automata;
+
+    automata.on();
+    automata.getMenu();
+
+    automata.coin(30);
+    automata.coin(30);
+    automata.choice(2);
+    automata.check();
+
+    automata.cook();
+    automata.finish();
+
+    automata.off();
+
     return 0;
 }
