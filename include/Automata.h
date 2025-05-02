@@ -5,33 +5,33 @@
 #include <vector>
 
 enum STATES {
-    POWER_OFF,
-    STANDBY,
-    PAYMENT,
-    VALIDATION,
-    PREPARING
+    OFF,
+    WAIT,
+    ACCEPT,
+    CHECK,
+    COOK
 };
 
 class Automata {
  private:
-    int balance;
-    std::vector<std::string> drinks;
-    std::vector<int> cost;
-    STATES status;
-    int selected;
+    int cash;
+    std::vector<std::string> menu;
+    std::vector<int> prices;
+    STATES state;
+    int currentDrink;
 
  public:
     Automata();
     STATES getState();
-    void displayMenu();
-    void powerOn();
-    void powerOff();
-    void insertCoin(int);
-    void cancelOrder();
-    void selectDrink(int);
-    void validate();
-    void prepare();
-    void complete();
+    void getMenu();
+    void on();
+    void off();
+    void coin(int);
+    void cancel();
+    void choice(int);
+    void check();
+    void cook();
+    void finish();
 };
 
-#endif
+#endif  // INCLUDE_AUTOMATA_H_
