@@ -54,7 +54,7 @@ TEST(AutomataTest, InsufficientFunds) {
     testing::internal::CaptureStdout();
     automata.check();
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_TRUE(output.find("Недостаточно денег") != std::string::npos);
+    EXPECT_TRUE(output.find("Insufficient funds") != std::string::npos);
 }
 
 TEST(AutomataTest, SuccessfulPayment) {
@@ -65,7 +65,7 @@ TEST(AutomataTest, SuccessfulPayment) {
     testing::internal::CaptureStdout();
     automata.check();
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_TRUE(output.find("Денег достаточно") != std::string::npos);
+    EXPECT_TRUE(output.find("Sufficient funds") != std::string::npos);
 }
 
 TEST(AutomataTest, CookingProcess) {
@@ -88,7 +88,7 @@ TEST(AutomataTest, CompleteCycle) {
     testing::internal::CaptureStdout();
     automata.finish();
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_TRUE(output.find("Сдача: 50") != std::string::npos);
+    EXPECT_TRUE(output.find("Change: 50") != std::string::npos);
     EXPECT_EQ(automata.getState(), WAIT);
 }
 
@@ -97,7 +97,7 @@ TEST(AutomataTest, InvalidStateTransition) {
     testing::internal::CaptureStdout();
     automata.choice(0);
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_TRUE(output.find("Некорректное состояние") != std::string::npos);
+    EXPECT_TRUE(output.find("Invalid state") != std::string::npos);
 }
 
 TEST(AutomataTest, ReturnToWaitStateAfterFinish) {
@@ -116,7 +116,7 @@ TEST(AutomataTest, MenuConsistency) {
     testing::internal::CaptureStdout();
     automata.getMenu();
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_TRUE(output.find("Чай - 15") != std::string::npos);
-    EXPECT_TRUE(output.find("Кофе с молоком - 30") != std::string::npos);
-    EXPECT_TRUE(output.find("Двойное эспрессо - 50") != std::string::npos);
+    EXPECT_TRUE(output.find("Tea - 15") != std::string::npos);
+    EXPECT_TRUE(output.find("Coffee with milk - 30") != std::string::npos);
+    EXPECT_TRUE(output.find("Double espresso - 50") != std::string::npos);
 }
