@@ -1,3 +1,5 @@
+// Copyright 2025 Owner
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -24,7 +26,7 @@ STATES Automata::getState() {
 void Automata::getMenu() {
     std::cout << "Меню:" << std::endl;
     for (size_t i = 0; i < menu.size(); i++) {
-        std::cout << i << ": " << menu[i] 
+        std::cout << i << ": " << menu[i]
                   << " - " << prices[i] << std::endl;
     }
 }
@@ -85,7 +87,8 @@ void Automata::choice(int drinkIndex) {
 void Automata::check() {
     if (state == CHECK) {
         if (cash >= prices[currentDrink]) {
-            std::cout << "Денег достаточно, начинаем приготовление" << std::endl;
+            std::cout << "Денег достаточно, начинаем приготовление"
+                      << std::endl;
         } else {
             std::cout << "Недостаточно денег" << std::endl;
         }
@@ -97,7 +100,7 @@ void Automata::check() {
 void Automata::cook() {
     if (state == CHECK) {
         state = COOK;
-        std::cout << "Приготовление напитка: " 
+        std::cout << "Приготовление напитка: "
                   << menu[currentDrink] << std::endl;
     } else {
         std::cout << "Некорректное состояние" << std::endl;
@@ -108,7 +111,7 @@ void Automata::finish() {
     if (state == COOK) {
         std::cout << "Напиток готов" << std::endl;
         if (cash > prices[currentDrink]) {
-            std::cout << "Сдача: " 
+            std::cout << "Сдача: "
                       << cash - prices[currentDrink] << std::endl;
         }
         cash = 0;
