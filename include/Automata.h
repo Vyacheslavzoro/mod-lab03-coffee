@@ -6,34 +6,34 @@
 #include <string>
 #include <vector>
 
-enum STATES {
-    OFF,
-    WAIT,
-    ACCEPT,
-    CHECK,
-    COOK
+enum MachineState {
+    POWERED_OFF,
+    IDLE,
+    MONEY_IN,
+    VERIFY,
+    PREPARE
 };
 
-class Automata {
+class VendingMachine {
  private:
-    int cash;
-    std::vector<std::string> menu;
-    std::vector<int> prices;
-    STATES state;
-    int currentDrink;
+    int balance;
+    std::vector<std::string> drinks;
+    std::vector<int> costs;
+    MachineState currentState;
+    int selectedIndex;
 
  public:
-    Automata();
-    STATES getState();
-    void getMenu();
-    void on();
-    void off();
-    void coin(int);
-    void cancel();
-    void choice(int);
-    void check();
-    void cook();
-    void finish();
+    VendingMachine();
+    MachineState state() const;
+    void displayMenu() const;
+    void powerOn();
+    void powerOff();
+    void insertMoney(int amount);
+    void abort();
+    void selectDrink(int index);
+    void validate();
+    void brew();
+    void complete();
 };
 
 #endif  // INCLUDE_AUTOMATA_H_
