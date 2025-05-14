@@ -21,7 +21,9 @@ MachineState VendingMachine::state() const {
 void VendingMachine::displayMenu() const {
     std::cout << "\nAvailable beverages:\n";
     for (size_t i = 0; i < drinks.size(); ++i) {
-        std::cout << "[" << i << "] " << drinks[i] << " - " << costs[i] << "₽\n";
+                std::cout << "[" << i << "] " << drinks[i]
+                  << " - " << costs[i] << "₽\n";
+
     }
 }
 
