@@ -23,7 +23,6 @@ void VendingMachine::displayMenu() const {
     for (size_t i = 0; i < drinks.size(); ++i) {
                 std::cout << "[" << i << "] " << drinks[i]
                   << " - " << costs[i] << "₽\n";
-
     }
 }
 
@@ -49,7 +48,8 @@ void VendingMachine::insertMoney(int amount) {
     if (currentState == IDLE || currentState == MONEY_IN) {
         balance += amount;
         currentState = MONEY_IN;
-        std::cout << "You added: " << amount << "₽. Balance: " << balance << "₽\n";
+        std::cout << "You added: " << amount << "₽. "
+          << "Balance: " << balance << "₽\n";
     } else {
         std::cout << "Can't insert money now.\n";
     }
