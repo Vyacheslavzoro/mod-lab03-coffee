@@ -1,120 +1,115 @@
-// Copyright 2025 Owner
+﻿// Copyright 2025 Owner
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include "Automata.h"
 
-Automata::Automata() {
-    state = OFF;
-    cash = 0;
-    currentDrink = -1;
+VendingMachine::VendingMachine() {
+    currentState = POWERED_OFF;
+    balance = 0;
+    selectedIndex = -1;
 
-    menu.push_back("Tea");
-    menu.push_back("Coffee with milk");
-    menu.push_back("Double espresso");
-
-    prices.push_back(15);
-    prices.push_back(30);
-    prices.push_back(50);
+    drinks = {"Black Tea", "Latte", "Espresso"};
+    costs = {15, 30, 50};
 }
 
-STATES Automata::getState() {
-    return state;
+MachineState VendingMachine::state() const {
+    return currentState;
 }
 
-void Automata::getMenu() {
-    std::cout << "Menu:" << std::endl;
-    for (size_t i = 0; i < menu.size(); i++) {
-        std::cout << i << ": " << menu[i]
-                  << " - " << prices[i] << std::endl;
+void VendingMachine::displayMenu() const {
+    std::cout << "\nAvailable beverages:\n";
+    for (size_t i = 0; i < drinks.size(); ++i) {
+        std::cout << "[" << i << "] " << drinks[i] << " - " << costs[i] << "₽\n";
     }
 }
 
-void Automata::on() {
-    if (state == OFF) {
-        state = WAIT;
-        std::cout << "Machine turned ON" << std::endl;
+void VendingMachine::powerOn() {
+    if (currentState == POWERED_OFF) {
+        currentState = IDLE;
+        std::cout << "System online.\n";
     } else {
-        std::cout << "Invalid state" << std::endl;
+        std::cout << "Cannot power on: machine already active.\n";
     }
 }
 
-void Automata::off() {
-    if (state == WAIT) {
-        state = OFF;
-        std::cout << "Machine turned OFF" << std::endl;
+void VendingMachine::powerOff() {
+    if (currentState == IDLE) {
+        currentState = POWERED_OFF;
+        std::cout << "System shutting down.\n";
     } else {
-        std::cout << "Invalid state" << std::endl;
+        std::cout << "Power off not allowed in current state.\n";
     }
 }
 
-void Automata::coin(int sum) {
-    if (state == WAIT || state == ACCEPT) {
-        state = ACCEPT;
-        cash += sum;
-        std::cout << "Inserted " << sum
-                  << ", current balance: " << cash << std::endl;
+void VendingMachine::insertMoney(int amount) {
+    if (currentState == IDLE || currentState == MONEY_IN) {
+        balance += amount;
+        currentState = MONEY_IN;
+        std::cout << "You added: " << amount << "₽. Balance: " << balance << "₽\n";
     } else {
-        std::cout << "Invalid state" << std::endl;
+        std::cout << "Can't insert money now.\n";
     }
 }
 
-void Automata::cancel() {
-    if (state == ACCEPT || state == CHECK) {
-        std::cout << "Canceled. Refund: " << cash << std::endl;
-        cash = 0;
-        state = WAIT;
+void VendingMachine::abort() {
+    if (currentState == MONEY_IN || currentState == VERIFY) {
+        std::cout << "Transaction canceled. Refunding " << balance << "₽.\n";
+        balance = 0;
+        selectedIndex = -1;
+        currentState = IDLE;
     } else {
-        std::cout << "Invalid state" << std::endl;
+        std::cout << "Nothing to cancel.\n";
     }
 }
 
-void Automata::choice(int drinkIndex) {
-    if (state == ACCEPT) {
-        if (drinkIndex >= 0 && drinkIndex < static_cast<int>(menu.size())) {
-            std::cout << "Selected: " << menu[drinkIndex] << std::endl;
-            currentDrink = drinkIndex;
-            state = CHECK;
+void VendingMachine::selectDrink(int index) {
+    if (currentState == MONEY_IN) {
+        if (index >= 0 && index < static_cast<int>(drinks.size())) {
+            selectedIndex = index;
+            currentState = VERIFY;
+            std::cout << "You've chosen: " << drinks[index] << "\n";
         } else {
-            std::cout << "Invalid drink index" << std::endl;
+            std::cout << "Invalid selection.\n";
         }
     } else {
-        std::cout << "Invalid state" << std::endl;
+        std::cout << "Cannot select now.\n";
     }
 }
 
-void Automata::check() {
-    if (state == CHECK) {
-        if (cash >= prices[currentDrink]) {
-            std::cout << "Sufficient funds. Preparing..." << std::endl;
+void VendingMachine::validate() {
+    if (currentState == VERIFY) {
+        if (balance >= costs[selectedIndex]) {
+            std::cout << "Payment confirmed.\n";
         } else {
-            std::cout << "Insufficient funds" << std::endl;
+            std::cout << "Not enough money for selected item.\n";
         }
     } else {
-        std::cout << "Invalid state" << std::endl;
+        std::cout << "No selection made yet.\n";
     }
 }
 
-void Automata::cook() {
-    if (state == CHECK) {
-        state = COOK;
-        std::cout << "Cooking: " << menu[currentDrink] << std::endl;
+void VendingMachine::brew() {
+    if (currentState == VERIFY) {
+        currentState = PREPARE;
+        std::cout << "Preparing: " << drinks[selectedIndex] << "\n";
     } else {
-        std::cout << "Invalid state" << std::endl;
+        std::cout << "Cannot prepare yet.\n";
     }
 }
 
-void Automata::finish() {
-    if (state == COOK) {
-        std::cout << "Done!" << std::endl;
-        if (cash > prices[currentDrink]) {
-            std::cout << "Change: " << cash - prices[currentDrink] << std::endl;
+void VendingMachine::complete() {
+    if (currentState == PREPARE) {
+        std::cout << "Your drink is ready.\n";
+        int change = balance - costs[selectedIndex];
+        if (change > 0) {
+            std::cout << "Don't forget your change: " << change << "₽\n";
         }
-        cash = 0;
-        state = WAIT;
-        currentDrink = -1;
+        balance = 0;
+        selectedIndex = -1;
+        currentState = IDLE;
     } else {
-        std::cout << "Invalid state" << std::endl;
+        std::cout << "No drink is being made.\n";
     }
 }

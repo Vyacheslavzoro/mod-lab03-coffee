@@ -3,20 +3,17 @@
 #include "Automata.h"
 
 int main() {
-    Automata automata;
+    VendingMachine machine;
 
-    automata.on();
-    automata.getMenu();
-
-    automata.coin(30);
-    automata.coin(30);
-    automata.choice(2);
-    automata.check();
-
-    automata.cook();
-    automata.finish();
-
-    automata.off();
+    machine.powerOn();
+    machine.displayMenu();
+    machine.insertMoney(20);
+    machine.insertMoney(40);
+    machine.selectDrink(2);
+    machine.validate();
+    machine.brew();
+    machine.complete();
+    machine.powerOff();
 
     return 0;
 }
