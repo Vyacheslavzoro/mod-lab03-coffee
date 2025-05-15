@@ -5,7 +5,6 @@
 
 void demonstrateWorkflow() {
     BeverageDispenser machine;
-    
     std::cout << "Demo 1: Successful purchase with change" << std::endl;
     machine.activate();
     machine.showOptions();
@@ -14,24 +13,20 @@ void demonstrateWorkflow() {
     machine.checkPayment();
     machine.processOrder();
     machine.finishOrder();
-    
     std::cout << "\nDemo 2: Insufficient funds scenario" << std::endl;
     machine.addFunds(20);
     machine.makeSelection(1);
     machine.checkPayment();
     machine.cancelTransaction();
-    
     std::cout << "\nDemo 3: Full cancellation" << std::endl;
     machine.addFunds(40);
     machine.cancelTransaction();
-    
     std::cout << "\nDemo 4: Exact amount purchase" << std::endl;
     machine.addFunds(15);
     machine.makeSelection(0);
     machine.checkPayment();
     machine.processOrder();
     machine.finishOrder();
-    
     machine.shutdown();
 }
 

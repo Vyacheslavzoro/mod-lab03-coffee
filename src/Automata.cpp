@@ -85,18 +85,19 @@ void BeverageDispenser::checkPayment() {
         if (user_credit >= beverage_options[chosen_option].second) {
             std::cout << "Payment accepted\n";
         } else {
-            std::cout << "Insufficient funds. Need " 
-                      << (beverage_options[chosen_option].second
-                          - user_credit)
+            std::cout << "Insufficient funds. Need "
+                      << (beverage_options[chosen_option].second - user_credit)
                       << " more coins\n";
         }
     }
 }
 
 void BeverageDispenser::processOrder() {
-    if (current_mode == CHECKING && user_credit >= beverage_options[chosen_option].second) {
+    if (current_mode == CHECKING &&
+        user_credit >= beverage_options[chosen_option].second) {
         current_mode = DISPENSING;
-        std::cout << "Making your " << beverage_options[chosen_option].first << "...\n";
+        std::cout << "Making your "
+                  << beverage_options[chosen_option].first << "...\n";
     }
 }
 
@@ -116,4 +117,3 @@ void BeverageDispenser::resetTransaction() {
     chosen_option = -1;
     current_mode = STANDBY;
 }
-
