@@ -4,90 +4,90 @@
 #include <string>
 #include "Automata.h"
 
-TEST(VendingMachineTest, StartsInOffState) {
-    VendingMachine vm;
-    EXPECT_EQ(vm.state(), POWERED_OFF);
+TEST(BeverageDispenserTest, InitialStateIsOff) {
+    BeverageDispenser bd;
+    EXPECT_EQ(bd.getCurrentMode(), OFF);
 }
 
-TEST(VendingMachineTest, PowerCycle) {
-    VendingMachine vm;
-    vm.powerOn();
-    EXPECT_EQ(vm.state(), IDLE);
-    vm.powerOff();
-    EXPECT_EQ(vm.state(), POWERED_OFF);
+TEST(BeverageDispenserTest, ActivationSequence) {
+    BeverageDispenser bd;
+    bd.activate();
+    EXPECT_EQ(bd.getCurrentMode(), STANDBY);
+    bd.shutdown();
+    EXPECT_EQ(bd.getCurrentMode(), OFF);
 }
 
-TEST(VendingMachineTest, InsertFunds) {
-    VendingMachine vm;
-    vm.powerOn();
-    vm.insertMoney(10);
-    EXPECT_EQ(vm.state(), MONEY_IN);
+TEST(BeverageDispenserTest, AcceptFundsProperly) {
+    BeverageDispenser bd;
+    bd.activate();
+    bd.addFunds(25);
+    EXPECT_EQ(bd.getCurrentMode(), ACCEPTING_CASH);
 }
 
-TEST(VendingMachineTest, RejectInsertWhenOff) {
-    VendingMachine vm;
-    vm.insertMoney(10);
-    EXPECT_NE(vm.state(), MONEY_IN);
+TEST(BeverageDispenserTest, BlockInvalidDeposit) {
+    BeverageDispenser bd;
+    bd.addFunds(50);
+    EXPECT_NE(bd.getCurrentMode(), ACCEPTING_CASH);
 }
 
-TEST(VendingMachineTest, CancelRefund) {
-    VendingMachine vm;
-    vm.powerOn();
-    vm.insertMoney(30);
-    vm.abort();
-    EXPECT_EQ(vm.state(), IDLE);
+TEST(BeverageDispenserTest, CancelOperationFlow) {
+    BeverageDispenser bd;
+    bd.activate();
+    bd.addFunds(40);
+    bd.cancelTransaction();
+    EXPECT_EQ(bd.getCurrentMode(), STANDBY);
 }
 
-TEST(VendingMachineTest, ValidDrinkSelect) {
-    VendingMachine vm;
-    vm.powerOn();
-    vm.insertMoney(100);
-    vm.selectDrink(1);
-    EXPECT_EQ(vm.state(), VERIFY);
+TEST(BeverageDispenserTest, ValidSelectionProcess) {
+    BeverageDispenser bd;
+    bd.activate();
+    bd.addFunds(75);
+    bd.makeSelection(2);
+    EXPECT_EQ(bd.getCurrentMode(), CHECKING);
 }
 
-TEST(VendingMachineTest, NotEnoughMoney) {
-    VendingMachine vm;
-    vm.powerOn();
-    vm.insertMoney(10);
-    vm.selectDrink(0);
+TEST(BeverageDispenserTest, InsufficientFundsCheck) {
+    BeverageDispenser bd;
+    bd.activate();
+    bd.addFunds(10);
+    bd.makeSelection(0);
     testing::internal::CaptureStdout();
-    vm.validate();
+    bd.checkPayment();
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("Not enough money"), std::string::npos);
+    EXPECT_TRUE(output.find("Insufficient funds") != std::string::npos);
 }
 
-TEST(VendingMachineTest, EnoughFundsFlow) {
-    VendingMachine vm;
-    vm.powerOn();
-    vm.insertMoney(60);
-    vm.selectDrink(2);
+TEST(BeverageDispenserTest, SuccessfulPaymentVerification) {
+    BeverageDispenser bd;
+    bd.activate();
+    bd.addFunds(65);
+    bd.makeSelection(2);
     testing::internal::CaptureStdout();
-    vm.validate();
+    bd.checkPayment();
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("Payment confirmed"), std::string::npos);
+    EXPECT_TRUE(output.find("accepted") != std::string::npos);
 }
 
-TEST(VendingMachineTest, BrewStateReached) {
-    VendingMachine vm;
-    vm.powerOn();
-    vm.insertMoney(60);
-    vm.selectDrink(2);
-    vm.validate();
-    vm.brew();
-    EXPECT_EQ(vm.state(), PREPARE);
+TEST(BeverageDispenserTest, DispensingStateTransition) {
+    BeverageDispenser bd;
+    bd.activate();
+    bd.addFunds(100);
+    bd.makeSelection(1);
+    bd.checkPayment();
+    bd.processOrder();
+    EXPECT_EQ(bd.getCurrentMode(), DISPENSING);
 }
 
-TEST(VendingMachineTest, FullPurchase) {
-    VendingMachine vm;
-    vm.powerOn();
-    vm.insertMoney(100);
-    vm.selectDrink(2);
-    vm.validate();
-    vm.brew();
+TEST(BeverageDispenserTest, CompleteOrderCycle) {
+    BeverageDispenser bd;
+    bd.activate();
+    bd.addFunds(100);
+    bd.makeSelection(2);
+    bd.checkPayment();
+    bd.processOrder();
     testing::internal::CaptureStdout();
-    vm.complete();
+    bd.finishOrder();
     std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_NE(output.find("change"), std::string::npos);
-    EXPECT_EQ(vm.state(), IDLE);
+    EXPECT_TRUE(output.find("Take change") != std::string::npos);
+    EXPECT_EQ(bd.getCurrentMode(), STANDBY);
 }

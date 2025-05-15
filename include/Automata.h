@@ -5,35 +5,38 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
-enum MachineState {
-    POWERED_OFF,
-    IDLE,
-    MONEY_IN,
-    VERIFY,
-    PREPARE
+enum SystemStatus {
+    OFF,
+    STANDBY,
+    ACCEPTING_CASH,
+    CHECKING,
+    DISPENSING
 };
 
-class VendingMachine {
+class BeverageDispenser {
  private:
-    int balance;
-    std::vector<std::string> drinks;
-    std::vector<int> costs;
-    MachineState currentState;
-    int selectedIndex;
+    int user_credit;
+    std::vector<std::pair<std::string, int>> beverage_options;
+    SystemStatus current_mode;
+    int chosen_option;
+
+    void resetTransaction();
 
  public:
-    VendingMachine();
-    MachineState state() const;
-    void displayMenu() const;
-    void powerOn();
-    void powerOff();
-    void insertMoney(int amount);
-    void abort();
-    void selectDrink(int index);
-    void validate();
-    void brew();
-    void complete();
+    BeverageDispenser();
+    SystemStatus getCurrentMode() const;
+    void showOptions() const;
+    void activate();
+    void shutdown();
+    void addFunds(int cash);
+    void cancelTransaction();
+    void makeSelection(int choice);
+    void checkPayment();
+    void processOrder();
+    void finishOrder();
 };
+
 
 #endif  // INCLUDE_AUTOMATA_H_

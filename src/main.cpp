@@ -2,18 +2,40 @@
 
 #include "Automata.h"
 
+void demonstrateWorkflow() {
+    BeverageDispenser machine;
+    
+    std::cout << "Demo 1: Successful purchase with change" << std::endl;
+    machine.activate();
+    machine.showOptions();
+    machine.addFunds(70);
+    machine.makeSelection(2);
+    machine.checkPayment();
+    machine.processOrder();
+    machine.finishOrder();
+    
+    std::cout << "\nDemo 2: Insufficient funds scenario" << std::endl;
+    machine.addFunds(20);
+    machine.makeSelection(1);
+    machine.checkPayment();
+    machine.cancelTransaction();
+    
+    std::cout << "\nDemo 3: Full cancellation" << std::endl;
+    machine.addFunds(40);
+    machine.cancelTransaction();
+    
+    std::cout << "\nDemo 4: Exact amount purchase" << std::endl;
+    machine.addFunds(15);
+    machine.makeSelection(0);
+    machine.checkPayment();
+    machine.processOrder();
+    machine.finishOrder();
+    
+    machine.shutdown();
+}
+
 int main() {
-    VendingMachine machine;
-
-    machine.powerOn();
-    machine.displayMenu();
-    machine.insertMoney(20);
-    machine.insertMoney(40);
-    machine.selectDrink(2);
-    machine.validate();
-    machine.brew();
-    machine.complete();
-    machine.powerOff();
-
+    demonstrateWorkflow();
+    std::cout << "\nAll demonstrations completed" << std::endl;
     return 0;
 }
