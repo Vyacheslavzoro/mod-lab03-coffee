@@ -9,7 +9,11 @@ BeverageDispenser::BeverageDispenser() {
     current_mode = OFF;
     user_credit = 0;
     chosen_option = -1;
-    beverage_options = {{"Classic Tea", 15}, {"Milky Coffee", 30}, {"Strong Coffee", 50}};
+    beverage_options = {
+        {"Classic Tea", 15},
+        {"Milky Coffee", 30},
+        {"Strong Coffee", 50}
+    };
 }
 
 SystemStatus BeverageDispenser::getCurrentMode() const {
@@ -46,7 +50,8 @@ void BeverageDispenser::addFunds(int cash) {
     if (current_mode == STANDBY || current_mode == ACCEPTING_CASH) {
         user_credit += cash;
         current_mode = ACCEPTING_CASH;
-        std::cout << "Added " << cash << " coins. Total: " << user_credit << "\n";
+        std::cout << "Added " << cash << " coins. Total: "
+                  << user_credit << "\n";
     } else {
         std::cout << "Deposit not available\n";
     }
@@ -81,7 +86,8 @@ void BeverageDispenser::checkPayment() {
             std::cout << "Payment accepted\n";
         } else {
             std::cout << "Insufficient funds. Need " 
-                      << (beverage_options[chosen_option].second - user_credit)
+                      << (beverage_options[chosen_option].second
+                          - user_credit)
                       << " more coins\n";
         }
     }

@@ -1,6 +1,7 @@
 // Copyright 2025 Owner
 
 #include "Automata.h"
+#include <iostream>
 
 void demonstrateWorkflow() {
     BeverageDispenser machine;
