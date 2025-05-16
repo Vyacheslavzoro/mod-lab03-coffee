@@ -1,37 +1,42 @@
 // Copyright 2025 Owner
 
 #include "Automata.h"
-#include <iostream>
-
-void demonstrateWorkflow() {
-    BeverageDispenser machine;
-    std::cout << "Demo 1: Successful purchase with change" << std::endl;
-    machine.activate();
-    machine.showOptions();
-    machine.addFunds(70);
-    machine.makeSelection(2);
-    machine.checkPayment();
-    machine.processOrder();
-    machine.finishOrder();
-    std::cout << "\nDemo 2: Insufficient funds scenario" << std::endl;
-    machine.addFunds(20);
-    machine.makeSelection(1);
-    machine.checkPayment();
-    machine.cancelTransaction();
-    std::cout << "\nDemo 3: Full cancellation" << std::endl;
-    machine.addFunds(40);
-    machine.cancelTransaction();
-    std::cout << "\nDemo 4: Exact amount purchase" << std::endl;
-    machine.addFunds(15);
-    machine.makeSelection(0);
-    machine.checkPayment();
-    machine.processOrder();
-    machine.finishOrder();
-    machine.shutdown();
-}
 
 int main() {
-    demonstrateWorkflow();
-    std::cout << "\nAll demonstrations completed" << std::endl;
+    Automata automata;
+
+    automata.on();
+
+    automata.setMenu(
+        {"Чай", "Кофе", "Молоко", "Какао", "Зеленый чай", "Эспрессо"},
+        {15, 25, 10, 30, 20, 40}
+    );
+
+    automata.coin(20);
+    automata.coin(15);
+    automata.coin(10);
+
+    automata.choice(3);  
+
+    if (automata.check()) {
+        automata.cook();
+        automata.finish();
+    } else {
+        automata.cancel();
+    }
+
+    automata.coin(50);
+
+    automata.choice(5);  
+
+    if (automata.check()) {
+        automata.cook();
+        automata.finish();
+    } else {
+        automata.cancel();
+    }
+
+    automata.off();
+
     return 0;
 }

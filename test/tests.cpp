@@ -4,90 +4,141 @@
 #include <string>
 #include "Automata.h"
 
-TEST(BeverageDispenserTest, InitialStateIsOff) {
-    BeverageDispenser bd;
-    EXPECT_EQ(bd.getCurrentMode(), OFF);
+TEST(AutomataTest, InitialStateIsOff) {
+    Automata a;
+    EXPECT_EQ(a.getState(), OFF);
 }
 
-TEST(BeverageDispenserTest, ActivationSequence) {
-    BeverageDispenser bd;
-    bd.activate();
-    EXPECT_EQ(bd.getCurrentMode(), STANDBY);
-    bd.shutdown();
-    EXPECT_EQ(bd.getCurrentMode(), OFF);
+TEST(AutomataTest, CoinWhenOff) {
+    Automata a;
+    a.coin(10);
+    EXPECT_EQ(a.getState(), OFF);
 }
 
-TEST(BeverageDispenserTest, AcceptFundsProperly) {
-    BeverageDispenser bd;
-    bd.activate();
-    bd.addFunds(25);
-    EXPECT_EQ(bd.getCurrentMode(), ACCEPTING_CASH);
+TEST(AutomataTest, ChoiceWhenOff) {
+    Automata a;
+    a.choice(0);
+    EXPECT_EQ(a.getState(), OFF);
 }
 
-TEST(BeverageDispenserTest, BlockInvalidDeposit) {
-    BeverageDispenser bd;
-    bd.addFunds(50);
-    EXPECT_NE(bd.getCurrentMode(), ACCEPTING_CASH);
+TEST(AutomataTest, ChoiceBeforeMoney) {
+    Automata a;
+    a.on();
+    a.setMenu({"Tea", "Coffee"}, {5, 10});
+    a.choice(0);
+    EXPECT_EQ(a.getState(), ON);
 }
 
-TEST(BeverageDispenserTest, CancelOperationFlow) {
-    BeverageDispenser bd;
-    bd.activate();
-    bd.addFunds(40);
-    bd.cancelTransaction();
-    EXPECT_EQ(bd.getCurrentMode(), STANDBY);
+TEST(AutomataTest, CancelWithoutTransaction) {
+    Automata a;
+    a.on();
+    a.cancel();
+    EXPECT_EQ(a.getState(), ON);
 }
 
-TEST(BeverageDispenserTest, ValidSelectionProcess) {
-    BeverageDispenser bd;
-    bd.activate();
-    bd.addFunds(75);
-    bd.makeSelection(2);
-    EXPECT_EQ(bd.getCurrentMode(), CHECKING);
+TEST(AutomataTest, Initialization) {
+    Automata a;
+    EXPECT_EQ(a.getState(), OFF);
 }
 
-TEST(BeverageDispenserTest, InsufficientFundsCheck) {
-    BeverageDispenser bd;
-    bd.activate();
-    bd.addFunds(10);
-    bd.makeSelection(0);
-    testing::internal::CaptureStdout();
-    bd.checkPayment();
-    std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_TRUE(output.find("Insufficient funds") != std::string::npos);
+TEST(AutomataTest, TurnOn) {
+    Automata a;
+    a.on();
+    EXPECT_EQ(a.getState(), ON);
 }
 
-TEST(BeverageDispenserTest, SuccessfulPaymentVerification) {
-    BeverageDispenser bd;
-    bd.activate();
-    bd.addFunds(65);
-    bd.makeSelection(2);
-    testing::internal::CaptureStdout();
-    bd.checkPayment();
-    std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_TRUE(output.find("accepted") != std::string::npos);
+TEST(AutomataTest, TurnOnTwice) {
+    Automata a;
+    a.on();
+    a.on();
+    EXPECT_EQ(a.getState(), ON);
 }
 
-TEST(BeverageDispenserTest, DispensingStateTransition) {
-    BeverageDispenser bd;
-    bd.activate();
-    bd.addFunds(100);
-    bd.makeSelection(1);
-    bd.checkPayment();
-    bd.processOrder();
-    EXPECT_EQ(bd.getCurrentMode(), DISPENSING);
+TEST(AutomataTest, TurnOff) {
+    Automata a;
+    a.on();
+    a.off();
+    EXPECT_EQ(a.getState(), OFF);
 }
 
-TEST(BeverageDispenserTest, CompleteOrderCycle) {
-    BeverageDispenser bd;
-    bd.activate();
-    bd.addFunds(100);
-    bd.makeSelection(2);
-    bd.checkPayment();
-    bd.processOrder();
-    testing::internal::CaptureStdout();
-    bd.finishOrder();
-    std::string output = testing::internal::GetCapturedStdout();
-    EXPECT_TRUE(output.find("Take change") != std::string::npos);
-    EXPECT_EQ(bd.getCurrentMode(), STANDBY);
+TEST(AutomataTest, TurnOffTwice) {
+    Automata a;
+    a.off();
+    EXPECT_EQ(a.getState(), OFF);
+}
+
+TEST(AutomataTest, InsertCoins) {
+    Automata a;
+    a.on();
+    a.coin(10);
+    EXPECT_EQ(a.getState(), WAITING_FOR_MONEY);
+}
+
+TEST(AutomataTest, SetMenuAndChooseValid) {
+    Automata a;
+    a.on();
+    a.setMenu({"Tea", "Coffee"}, {5, 10});
+    a.coin(10);
+    a.choice(1);
+    EXPECT_EQ(a.getState(), CHECKING_MONEY);
+}
+
+TEST(AutomataTest, ChooseInvalidIndex) {
+    Automata a;
+    a.on();
+    a.setMenu({"Tea", "Coffee"}, {5, 10});
+    a.coin(10);
+    a.choice(5); 
+    EXPECT_EQ(a.getState(), WAITING_FOR_MONEY);
+}
+
+TEST(AutomataTest, CheckMoneySufficient) {
+    Automata a;
+    a.on();
+    a.setMenu({"Tea", "Coffee"}, {5, 10});
+    a.coin(10);
+    a.choice(0);
+    EXPECT_TRUE(a.check());
+}
+
+TEST(AutomataTest, CheckMoneyInsufficient) {
+    Automata a;
+    a.on();
+    a.setMenu({"Tea", "Coffee"}, {15, 20});
+    a.coin(10);
+    a.choice(0);
+    EXPECT_FALSE(a.check());
+}
+
+TEST(AutomataTest, CancelTransaction) {
+    Automata a;
+    a.on();
+    a.setMenu({"Tea"}, {5});
+    a.coin(10);
+    a.choice(0);
+    a.cancel();
+    EXPECT_EQ(a.getState(), ON);
+}
+
+TEST(AutomataTest, CookDrink) {
+    Automata a;
+    a.on();
+    a.setMenu({"Tea"}, {5});
+    a.coin(10);
+    a.choice(0);
+    ASSERT_TRUE(a.check());
+    a.cook();
+    EXPECT_EQ(a.getState(), COOKING);
+}
+
+TEST(AutomataTest, FinishOrder) {
+    Automata a;
+    a.on();
+    a.setMenu({"Tea"}, {5});
+    a.coin(10);
+    a.choice(0);
+    ASSERT_TRUE(a.check());
+    a.cook();
+    a.finish();
+    EXPECT_EQ(a.getState(), ON);
 }

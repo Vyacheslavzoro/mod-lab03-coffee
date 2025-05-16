@@ -1,42 +1,38 @@
-// Copyright 2025 Owner
-
-#ifndef INCLUDE_AUTOMATA_H_
-#define INCLUDE_AUTOMATA_H_
+#ifndef AUTOMATA_H
+#define AUTOMATA_H
 
 #include <string>
 #include <vector>
-#include <utility>
 
-enum SystemStatus {
+enum STATES {
     OFF,
-    STANDBY,
-    ACCEPTING_CASH,
-    CHECKING,
-    DISPENSING
+    ON,
+    WAITING_FOR_MONEY,
+    CHECKING_MONEY,
+    COOKING
 };
 
-class BeverageDispenser {
- private:
-    int user_credit;
-    std::vector<std::pair<std::string, int>> beverage_options;
-    SystemStatus current_mode;
-    int chosen_option;
+class Automata {
+private:
+    int cash;
+    std::vector<std::string> menu;
+    std::vector<int> prices;
+    STATES state;
+    int chosen_index;
 
-    void resetTransaction();
+public:
+    Automata();
 
- public:
-    BeverageDispenser();
-    SystemStatus getCurrentMode() const;
-    void showOptions() const;
-    void activate();
-    void shutdown();
-    void addFunds(int cash);
-    void cancelTransaction();
-    void makeSelection(int choice);
-    void checkPayment();
-    void processOrder();
-    void finishOrder();
+    void on();
+    void off();
+    void coin(int amount);
+    void setMenu(const std::vector<std::string>& drinks, const std::vector<int>& costs);
+    STATES getState() const;
+    void choice(int index);
+    bool check();
+    void cancel();
+    void cook();
+    void finish();
 };
 
-
-#endif  // INCLUDE_AUTOMATA_H_
+#endif // AUTOMATA_H

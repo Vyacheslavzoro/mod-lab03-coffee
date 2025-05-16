@@ -1,119 +1,134 @@
 ﻿// Copyright 2025 Owner
 
-#include <iostream>
-#include <string>
-#include <vector>
 #include "Automata.h"
+#include <iostream>
+#include <thread>
+#include <chrono>
 
-BeverageDispenser::BeverageDispenser() {
-    current_mode = OFF;
-    user_credit = 0;
-    chosen_option = -1;
-    beverage_options = {
-        {"Classic Tea", 15},
-        {"Milky Coffee", 30},
-        {"Strong Coffee", 50}
-    };
+Automata::Automata() {
+    cash = 0;
+    state = OFF;
+    chosen_index = -1;
+    std::cout << "[Инициализация] Автомат создан и находится в выключенном состоянии.\n";
 }
 
-SystemStatus BeverageDispenser::getCurrentMode() const {
-    return current_mode;
-}
-
-void BeverageDispenser::showOptions() const {
-    std::cout << "\nMenu Options:\n";
-    for (size_t idx = 0; idx < beverage_options.size(); ++idx) {
-        std::cout << idx << ") " << beverage_options[idx].first
-                  << " - " << beverage_options[idx].second << " coins\n";
-    }
-}
-
-void BeverageDispenser::activate() {
-    if (current_mode == OFF) {
-        current_mode = STANDBY;
-        std::cout << "Welcome! System ready\n";
+void Automata::on() {
+    if (state == OFF) {
+        state = ON;
+        std::cout << "Автомат теперь включен и готов к работе.\n";
+        std::cout << "Пожалуйста, внесите деньги, чтобы начать выбор напитка.\n";
     } else {
-        std::cout << "Already operational\n";
+        std::cout << "Автомат уже включен и ожидает ваших действий.\n";
     }
 }
 
-void BeverageDispenser::shutdown() {
-    if (current_mode == STANDBY) {
-        current_mode = OFF;
-        std::cout << "Powering down\n";
+void Automata::off() {
+    if (state != OFF) {
+        cash = 0;
+        chosen_index = -1;
+        state = OFF;
+        std::cout << "Автомат выключается. Спасибо за использование!\n";
     } else {
-        std::cout << "Cannot shutdown now\n";
+        std::cout << "Автомат уже выключен, повторное выключение невозможно.\n";
     }
 }
 
-void BeverageDispenser::addFunds(int cash) {
-    if (current_mode == STANDBY || current_mode == ACCEPTING_CASH) {
-        user_credit += cash;
-        current_mode = ACCEPTING_CASH;
-        std::cout << "Added " << cash << " coins. Total: "
-                  << user_credit << "\n";
+void Automata::coin(int amount) {
+    if (state == ON || state == WAITING_FOR_MONEY) {
+        cash += amount;
+        state = WAITING_FOR_MONEY;
+        std::cout << "Внесено " << amount << " монет. Текущий баланс: " << cash << " монет.\n";
+        std::cout << "Вы можете выбрать напиток из меню.\n";
     } else {
-        std::cout << "Deposit not available\n";
+        std::cout << "Извините, автомат сейчас не принимает деньги.\n";
     }
 }
 
-void BeverageDispenser::cancelTransaction() {
-    if (current_mode == ACCEPTING_CASH || current_mode == CHECKING) {
-        std::cout << "Canceling. Refunding " << user_credit << " coins\n";
-        resetTransaction();
-    } else {
-        std::cout << "No active transaction\n";
+void Automata::setMenu(const std::vector<std::string>& drinks, const std::vector<int>& costs) {
+    menu = drinks;
+    prices = costs;
+
+    std::cout << "Меню напитков обновлено и готово к просмотру:\n";
+    for (size_t i = 0; i < menu.size(); ++i) {
+        std::cout << "  " << i << ". " << menu[i] << " — стоимость: " << prices[i] << " монет.\n";
     }
+    std::cout << "Пожалуйста, внесите деньги и выберите желаемый напиток.\n";
 }
 
-void BeverageDispenser::makeSelection(int choice) {
-    if (current_mode == ACCEPTING_CASH) {
-        if (choice >= 0 && choice < static_cast<int>(beverage_options.size())) {
-            chosen_option = choice;
-            current_mode = CHECKING;
-            std::cout << "Selected: " << beverage_options[choice].first << "\n";
+STATES Automata::getState() const {
+    return state;
+}
+
+void Automata::choice(int index) {
+    if (state == WAITING_FOR_MONEY) {
+        if (index >= 0 && index < static_cast<int>(menu.size())) {
+            chosen_index = index;
+            state = CHECKING_MONEY;
+            std::cout << "Вы выбрали напиток: " << menu[chosen_index] << ".\n";
+            std::cout << "Проверяем наличие достаточной суммы для оплаты...\n";
         } else {
-            std::cout << "Invalid option\n";
+            std::cout << "Некорректный выбор. Пожалуйста, выберите напиток из меню.\n";
         }
     } else {
-        std::cout << "Selection unavailable\n";
+        std::cout << "Выбор напитка невозможен в текущем состоянии автомата.\n";
     }
 }
 
-void BeverageDispenser::checkPayment() {
-    if (current_mode == CHECKING) {
-        if (user_credit >= beverage_options[chosen_option].second) {
-            std::cout << "Payment accepted\n";
+bool Automata::check() {
+    if (state == CHECKING_MONEY && chosen_index != -1) {
+        if (cash >= prices[chosen_index]) {
+            std::cout << "Средств достаточно для оплаты напитка.\n";
+            return true;
         } else {
-            std::cout << "Insufficient funds. Need "
-                      << (beverage_options[chosen_option].second - user_credit)
-                      << " more coins\n";
+            int deficit = prices[chosen_index] - cash;
+            std::cout << "Недостаточно средств. Необходимо добавить еще " << deficit << " монет.\n";
+            return false;
         }
+    } else {
+        std::cout << "Проверка невозможна в текущем состоянии автомата.\n";
+        return false;
     }
 }
 
-void BeverageDispenser::processOrder() {
-    if (current_mode == CHECKING &&
-        user_credit >= beverage_options[chosen_option].second) {
-        current_mode = DISPENSING;
-        std::cout << "Making your "
-                  << beverage_options[chosen_option].first << "...\n";
+void Automata::cancel() {
+    if (state == WAITING_FOR_MONEY || state == CHECKING_MONEY) {
+        std::cout << "Отмена операции. Возвращаем внесённые деньги: " << cash << " монет.\n";
+        cash = 0;
+        chosen_index = -1;
+        state = ON;
+        std::cout << "Автомат готов к новой операции.\n";
+    } else {
+        std::cout << "Отмена невозможна: нет активной транзакции.\n";
     }
 }
 
-void BeverageDispenser::finishOrder() {
-    if (current_mode == DISPENSING) {
-        int change = user_credit - beverage_options[chosen_option].second;
+void Automata::cook() {
+    if (state == CHECKING_MONEY && chosen_index != -1) {
+        if (cash >= prices[chosen_index]) {
+            std::cout << "Приготовление напитка \"" << menu[chosen_index] << "\" началось.\n";
+            state = COOKING;
+            std::cout << "Пожалуйста, подождите...\n";
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+        } else {
+            std::cout << "Невозможно начать приготовление: недостаточно средств.\n";
+        }
+    } else {
+        std::cout << "Приготовление невозможно в текущем состоянии.\n";
+    }
+}
+
+void Automata::finish() {
+    if (state == COOKING) {
+        int change = cash - prices[chosen_index];
         if (change > 0) {
-            std::cout << "Take change: " << change << " coins\n";
+            std::cout << "Пожалуйста, заберите сдачу: " << change << " монет.\n";
         }
-        std::cout << "Enjoy your drink!\n\n";
-        resetTransaction();
+        std::cout << "Ваш напиток готов! Приятного аппетита!\n";
+        cash = 0;
+        chosen_index = -1;
+        state = ON;
+        std::cout << "Автомат готов к следующему клиенту.\n";
+    } else {
+        std::cout << "Завершение заказа невозможно в текущем состоянии.\n";
     }
-}
-
-void BeverageDispenser::resetTransaction() {
-    user_credit = 0;
-    chosen_option = -1;
-    current_mode = STANDBY;
 }
