@@ -8,7 +8,7 @@ int main() {
     automata.on();
 
     automata.setMenu({
-        "Tea", "Coffee", "Milk", 
+        "Tea", "Coffee", "Milk",
         "Cocoa", "Green tea", "Espresso"
     }, {
         15, 25, 10,

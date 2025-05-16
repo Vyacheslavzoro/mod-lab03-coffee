@@ -71,7 +71,7 @@ void Automata::choice(int index) {
         if (index >= 0 && index < static_cast<int>(menu.size())) {
             chosen_index = index;
             state = CHECKING_MONEY;
-            std::cout << "Вы выбрали напиток: " 
+            std::cout << "Вы выбрали напиток: "
                       << menu[chosen_index] << ".\n";
             std::cout << "Проверяем наличие достаточной "
                          "суммы для оплаты...\n";
@@ -118,7 +118,7 @@ void Automata::cancel() {
 void Automata::cook() {
     if (state == CHECKING_MONEY && chosen_index != -1) {
         if (cash >= prices[chosen_index]) {
-            std::cout << "Приготовление напитка \"" << menu[chosen_index] 
+            std::cout << "Приготовление напитка \"" << menu[chosen_index]
                       << "\" началось.\n";
             state = COOKING;
             std::cout << "Пожалуйста, подождите...\n";
@@ -136,7 +136,7 @@ void Automata::finish() {
     if (state == COOKING) {
         int change = cash - prices[chosen_index];
         if (change > 0) {
-            std::cout << "Пожалуйста, заберите сдачу: " 
+            std::cout << "Пожалуйста, заберите сдачу: "
                       << change << " монет.\n";
         }
         std::cout << "Ваш напиток готов! Приятного аппетита!\n";
