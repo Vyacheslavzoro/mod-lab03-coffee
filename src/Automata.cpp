@@ -12,14 +12,15 @@ Automata::Automata() {
     cash = 0;
     state = OFF;
     chosen_index = -1;
-    std::cout << "[Инициализация] Автомат создан и находится в выключенном состоянии.\n";
+    std::cout << "Автомат создан и находится в выключенном состоянии.\n";
 }
 
 void Automata::on() {
     if (state == OFF) {
         state = ON;
         std::cout << "Автомат теперь включен и готов к работе.\n";
-        std::cout << "Пожалуйста, внесите деньги, чтобы начать выбор напитка.\n";
+        std::cout << "Пожалуйста, внесите деньги,
+                чтобы начать выбор напитка.\n";
     } else {
         std::cout << "Автомат уже включен и ожидает ваших действий.\n";
     }
@@ -48,7 +49,8 @@ void Automata::coin(int amount) {
     }
 }
 
-void Automata::setMenu(const std::vector<std::string>& drinks, const std::vector<int>& costs) {
+void Automata::setMenu(const std::vector<std::string>& drinks,
+const std::vector<int>& costs) {
     menu = drinks;
     prices = costs;
 
@@ -69,8 +71,10 @@ void Automata::choice(int index) {
         if (index >= 0 && index < static_cast<int>(menu.size())) {
             chosen_index = index;
             state = CHECKING_MONEY;
-            std::cout << "Вы выбрали напиток: " << menu[chosen_index] << ".\n";
-            std::cout << "Проверяем наличие достаточной суммы для оплаты...\n";
+            std::cout << "Вы выбрали напиток: " 
+            << menu[chosen_index] << ".\n";
+            std::cout << "Проверяем наличие достаточной
+            суммы для оплаты...\n";
         } else {
             std::cout << "Некорректный выбор. Пожалуйста, выберите напиток из меню.\n";
         }
@@ -105,7 +109,8 @@ void Automata::cancel() {
         state = ON;
         std::cout << "Автомат готов к новой операции.\n";
     } else {
-        std::cout << "Отмена невозможна: нет активной транзакции.\n";
+        std::cout << "Отмена невозможна:
+        нет активной транзакции.\n";
     }
 }
 

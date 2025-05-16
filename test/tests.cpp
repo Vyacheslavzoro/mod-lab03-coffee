@@ -88,7 +88,7 @@ TEST(AutomataTest, ChooseInvalidIndex) {
     a.on();
     a.setMenu({"Tea", "Coffee"}, {5, 10});
     a.coin(10);
-    a.choice(5); 
+    a.choice(5);
     EXPECT_EQ(a.getState(), WAITING_FOR_MONEY);
 }
 

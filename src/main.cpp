@@ -7,16 +7,14 @@ int main() {
 
     automata.on();
 
-    automata.setMenu(
-        {"Чай", "Кофе", "Молоко", "Какао", "Зеленый чай", "Эспрессо"},
-        {15, 25, 10, 30, 20, 40}
-    );
+    automata.setMenu({"Чай", "Кофе", "Молоко", "Какао", "Зеленый чай", "Эспрессо"},
+                     {15, 25, 10, 30, 20, 40});
 
     automata.coin(20);
     automata.coin(15);
     automata.coin(10);
 
-    automata.choice(3);  
+    automata.choice(3);
 
     if (automata.check()) {
         automata.cook();
@@ -27,7 +25,7 @@ int main() {
 
     automata.coin(50);
 
-    automata.choice(5);  
+    automata.choice(5);
 
     if (automata.check()) {
         automata.cook();
