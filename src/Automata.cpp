@@ -4,6 +4,9 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <string>
+#include <vector>
+
 
 Automata::Automata() {
     cash = 0;
@@ -37,7 +40,8 @@ void Automata::coin(int amount) {
     if (state == ON || state == WAITING_FOR_MONEY) {
         cash += amount;
         state = WAITING_FOR_MONEY;
-        std::cout << "Внесено " << amount << " монет. Текущий баланс: " << cash << " монет.\n";
+        std::cout << "Внесено " << amount << " монет. Текущий баланс: "
+            << cash << " монет.\n";
         std::cout << "Вы можете выбрать напиток из меню.\n";
     } else {
         std::cout << "Извините, автомат сейчас не принимает деньги.\n";
@@ -50,7 +54,8 @@ void Automata::setMenu(const std::vector<std::string>& drinks, const std::vector
 
     std::cout << "Меню напитков обновлено и готово к просмотру:\n";
     for (size_t i = 0; i < menu.size(); ++i) {
-        std::cout << "  " << i << ". " << menu[i] << " — стоимость: " << prices[i] << " монет.\n";
+        std::cout << "  " << i << ". " << menu[i] << " — стоимость: "
+            << prices[i] << " монет.\n";
     }
     std::cout << "Пожалуйста, внесите деньги и выберите желаемый напиток.\n";
 }
@@ -81,7 +86,8 @@ bool Automata::check() {
             return true;
         } else {
             int deficit = prices[chosen_index] - cash;
-            std::cout << "Недостаточно средств. Необходимо добавить еще " << deficit << " монет.\n";
+            std::cout << "Недостаточно средств. Необходимо добавить еще "
+                << deficit << " монет.\n";
             return false;
         }
     } else {
@@ -92,7 +98,8 @@ bool Automata::check() {
 
 void Automata::cancel() {
     if (state == WAITING_FOR_MONEY || state == CHECKING_MONEY) {
-        std::cout << "Отмена операции. Возвращаем внесённые деньги: " << cash << " монет.\n";
+        std::cout << "Отмена операции. Возвращаем внесённые деньги: "
+            << cash << " монет.\n";
         cash = 0;
         chosen_index = -1;
         state = ON;
@@ -105,7 +112,8 @@ void Automata::cancel() {
 void Automata::cook() {
     if (state == CHECKING_MONEY && chosen_index != -1) {
         if (cash >= prices[chosen_index]) {
-            std::cout << "Приготовление напитка \"" << menu[chosen_index] << "\" началось.\n";
+            std::cout << "Приготовление напитка \"" << menu[chosen_index] 
+                << "\" началось.\n";
             state = COOKING;
             std::cout << "Пожалуйста, подождите...\n";
             std::this_thread::sleep_for(std::chrono::seconds(2));
