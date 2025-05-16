@@ -7,8 +7,13 @@ int main() {
 
     automata.on();
 
-    automata.setMenu({"Чай", "Кофе", "Молоко", "Какао", "Зеленый чай", "Эспрессо"},
-                     {15, 25, 10, 30, 20, 40});
+    automata.setMenu({
+        "Tea", "Coffee", "Milk", 
+        "Cocoa", "Green tea", "Espresso"
+    }, {
+        15, 25, 10,
+        30, 20, 40
+    });
 
     automata.coin(20);
     automata.coin(15);
